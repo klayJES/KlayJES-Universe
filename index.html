@@ -17,13 +17,53 @@
 
     <style>
         /* MODERN DARK THEME */
+        :root {
+            --accent: #00ff88;
+            --bg-top: #1a1a1a;
+            --bg-bot: #000;
+        }
+
+        /* TIME BASED THEME OVERRIDES */
+        body.theme-night { --accent: #bb86fc; --bg-top: #12002b; }
+        body.theme-morning { --accent: #ffb700; --bg-top: #2b1b00; }
+
+        /* RAINBOW COMMAND EFFECT */
+        body.rainbow-mode {
+            animation: rainbowShift 5s linear infinite !important;
+        }
+        @keyframes rainbowShift {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
         body { 
             margin: 0; 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: radial-gradient(circle at top, #1a1a1a, #000); 
+            background: radial-gradient(circle at top, var(--bg-top), var(--bg-bot)); 
             color: #fff; 
             overflow-x: hidden; 
+            transition: background 1s ease;
+            min-height: 100vh;
         }
+
+        /* VIRAL SHAKE ANIMATION */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            40% { transform: translate(3px, 2px) rotate(-1deg); }
+            100% { transform: translate(1px, -2px) rotate(0deg); }
+        }
+        .shake-it { animation: shake 0.5s; }
+
+        /* GLITCH EFFECT */
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 red, -2px 0 blue; transform: translate(0); }
+            25% { transform: translate(-2px, 2px); }
+            50% { text-shadow: -2px 0 red, 2px 0 blue; transform: translate(2px, -2px); }
+            75% { transform: translate(-1px, -1px); }
+            100% { text-shadow: 2px 0 red, -2px 0 blue; transform: translate(0); }
+        }
+        .glitch-text { animation: glitch 0.2s infinite !important; color: #ff4444 !important; }
 
         /* --- GLOBAL ANNOUNCEMENT BANNER STYLE --- */
         #announcementBanner {
@@ -61,8 +101,8 @@
             padding: 25px; margin-top: 25px; border: 1px solid rgba(255, 255, 255, 0.1); 
         }
         h1 { font-weight: 800; text-align: center; font-size: 2.5rem; cursor: pointer; transition: 0.3s; }
-        h1:hover { color: #00ff88; }
-        h2 { border-left: 4px solid #00ff88; padding-left: 15px; margin-bottom: 20px; font-size: 1.5rem; }
+        h1:hover { color: var(--accent); }
+        h2 { border-left: 4px solid var(--accent); padding-left: 15px; margin-bottom: 20px; font-size: 1.5rem; }
 
         /* AUDIO VISUALIZER */
         .viz-container {
@@ -75,7 +115,7 @@
         }
         .viz-bar {
             width: 3px;
-            background: #00ff88;
+            background: var(--accent);
             animation: bounce 0.5s ease-in-out infinite alternate;
         }
         @keyframes bounce {
@@ -86,7 +126,6 @@
         /* GRID & CARDS */
         .grid { 
             display: grid; 
-            /* Optimized for responsiveness */
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
             gap: 15px; 
         }
@@ -94,7 +133,7 @@
             background: #111; padding: 15px; border-radius: 10px; 
             text-align: center; transition: 0.3s; border: 1px solid #333; cursor: pointer; 
         }
-        .card:hover { transform: translateY(-5px); border-color: #00ff88; }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
         .thumb { font-size: 35px; margin-bottom: 10px; display: block; }
 
         /* BUTTONS */
@@ -112,6 +151,14 @@
             border-radius: 6px; border: none; font-weight: bold; cursor: pointer; margin-top: 20px;
         }
         .btn-wipe:hover { background: #ff0000; }
+
+        /* DON'T CLICK BUTTON */
+        .btn-danger-viral {
+            background: #220000; border: 2px solid #ff0000; color: #ff0000;
+            padding: 15px; width: 100%; border-radius: 10px; font-family: monospace;
+            font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 20px;
+        }
+        .btn-danger-viral:active { transform: scale(0.95); background: #ff0000; color: white; }
 
         /* YT SECRET BUTTON & TRACKER */
         #ytSecretBtn { 
@@ -132,21 +179,31 @@
             max-height: 85vh; overflow-y: auto; 
         }
 
+        /* COMMAND CODEX BOX STYLE */
+        .command-codex-box {
+            background: #000;
+            border: 1px dashed #444;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #00ff88;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
         /* STATS STYLES */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
         .stat-card { background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333; text-align: center; cursor: pointer; transition: 0.3s; }
-        .stat-card:hover { border-color: #00ff88; }
-        .stat-val { display: block; font-size: 1.5rem; font-weight: bold; color: #00ff88; }
+        .stat-card:hover { border-color: var(--accent); }
+        .stat-val { display: block; font-size: 1.5rem; font-weight: bold; color: var(--accent); }
         .stat-label { font-size: 10px; color: #888; text-transform: uppercase; }
 
         /* ADMIN ONLY VIEW */
         #adminOnlyStats { display: none; margin-top: 20px; border-top: 2px solid #333; padding-top: 20px; }
-        .percent-bar { height: 8px; background: #333; border-radius: 10px; margin-top: 5px; position: relative; overflow: hidden; }
-        .percent-fill { height: 100%; background: #00ff88; width: 0%; transition: width 1s; }
-        .deleted-vault { background: #1a0000; border: 1px solid #400; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 12px; }
 
         .secret-item { padding: 12px; background: #0a0a0a; border-radius: 8px; margin: 8px 0; border: 1px solid #222; transition: 0.3s; }
-        .secret-item.unlocked { border-color: #00ff88; background: rgba(0,255,136,0.05); color: #00ff88; }
+        .secret-item.unlocked { border-color: var(--accent); background: rgba(0,255,136,0.05); color: var(--accent); }
 
         /* QUIZ */
         .quiz-option { 
@@ -156,54 +213,17 @@
         }
         .correct { background: #006400 !important; border-color: #00ff00 !important; }
         .wrong { background: #8b0000 !important; border-color: #ff4444 !important; }
-        .no-click { pointer-events: none; }
 
-        /* COMMENTS & BADGES */
+        /* COMMENTS */
         textarea, input, select { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; }
-        .comment-item { position: relative; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; margin-top: 10px; border-left: 3px solid #00ff88; }
-        
-        .badge-list { margin-top: 8px; display: flex; gap: 5px; flex-wrap: wrap; }
-        .badge-icon { 
-            background: rgba(0,255,136,0.15); border: 1px solid #00ff88; 
-            padding: 2px 8px; border-radius: 20px; font-size: 10px; color: #00ff88; 
-        }
+        .comment-item { position: relative; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; margin-top: 10px; border-left: 3px solid var(--accent); }
 
-        .admin-badge-trigger {
-            position: absolute; top: 10px; right: 10px;
-            cursor: pointer; font-size: 18px; color: #555; display: none;
-        }
-        .admin-badge-trigger:hover { color: #00ff88; }
-
-        .badge-selector {
-            display: none; position: absolute; top: 35px; right: 10px;
-            background: #222; border: 1px solid #444; border-radius: 8px;
-            padding: 10px; z-index: 10; grid-template-columns: 1fr; gap: 5px;
-        }
-        .badge-opt { 
-            background: #111; border: 1px solid #333; color: white; 
-            padding: 5px; font-size: 11px; cursor: pointer; border-radius: 4px;
-            text-align: left;
-        }
-        .badge-opt:hover { background: #00ff88; color: black; }
-
-        /* --- MOBILE & TABLET OPTIMIZATION --- */
+        /* MOBILE OPTIMIZATION */
         @media (max-width: 768px) {
             h1 { font-size: 1.8rem; }
-            h2 { font-size: 1.2rem; }
-            .container { padding: 10px; }
-            section { padding: 15px; margin-top: 15px; }
-            .btn { width: 100%; margin-bottom: 8px; padding: 15px; }
-            .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-            #secretBox { width: 95%; padding: 15px; }
-            .stats-grid { grid-template-columns: 1fr; }
-            #ytSecretBtn { width: 45px; height: 32px; top: 60px; }
+            .grid { grid-template-columns: 1fr 1fr; }
+            #ytSecretBtn { top: 60px; }
         }
-
-        @media (max-width: 480px) {
-            .grid { grid-template-columns: 1fr; }
-            h1 { font-size: 1.5rem; }
-        }
-
     </style>
 </head>
 <body>
@@ -217,7 +237,7 @@
     <div id="loadingOverlay">
         <h2 style="letter-spacing: 3px; font-weight: 900;">KLAYJES UNIVERSE</h2>
         <div class="loader-bar"><div class="loader-fill"></div></div>
-        <p style="font-size: 10px; margin-top: 10px; color: #555;">Initializing Audio Protocol...</p>
+        <p style="font-size: 10px; margin-top: 10px; color: #555;">Initializing Viral Protocols...</p>
     </div>
 
     <div id="ytSecretBtn" onclick="openTracker()"></div>
@@ -237,8 +257,6 @@
                         <div class="viz-bar" style="animation-delay: 0.1s"></div>
                         <div class="viz-bar" style="animation-delay: 0.3s"></div>
                         <div class="viz-bar" style="animation-delay: 0.2s"></div>
-                        <div class="viz-bar" style="animation-delay: 0.4s"></div>
-                        <div class="viz-bar" style="animation-delay: 0.1s"></div>
                     </div>
                 </div>
             </div>
@@ -248,82 +266,66 @@
             <div id="adminOnlyStats">
                 <h3 style="color:#ff4444; border-bottom: 1px solid #444; padding-bottom: 5px;">Server Master Analytics</h3>
                 
-                <div class="stat-card" style="margin-bottom: 15px; background: #221111;">
-                    <span class="stat-label">📣 UPDATE GLOBAL ANNOUNCEMENT</span>
-                    <input type="text" id="adminAnnounceInput" placeholder="Enter message here...">
+                <div class="command-codex-box">
+                    <span style="font-size: 10px; color: #888; text-transform: uppercase;">Command Codex</span><br>
+                    :glitch [on/off] - Toggle Title Glitch<br>
+                    :rainbow [on/off] - Toggle Color Loop<br>
+                    :theme [night/morning/default] - Change UI<br>
+                    :alert [msg] - System Console Message
+                </div>
+
+                <div class="stat-card" style="margin-bottom: 15px; background: #221111; text-align: left;">
+                    <span class="stat-label">📣 UPDATE GLOBAL ANNOUNCEMENT / EXECUTE COMMAND</span>
+                    <input type="text" id="adminAnnounceInput" placeholder="Enter message or :command here...">
                     
                     <div style="display: flex; gap: 10px; margin-top: 10px; align-items: center;">
-                        <span style="font-size: 10px; color: #888;">COLOR:</span>
+                        <span style="font-size: 10px; color: #888;">BANNER COLOR:</span>
                         <input type="color" id="bannerColor" value="#ff0000" style="width: 50px; padding: 2px; height: 30px; cursor: pointer; border:none;">
                     </div>
 
                     <div style="display: flex; gap: 5px; margin-top: 10px;">
-                        <button class="btn" style="flex: 2; padding: 8px;" onclick="updateAnnouncement()">Update Banner</button>
+                        <button class="btn" style="flex: 2; padding: 8px;" onclick="updateAnnouncement()">Execute Action</button>
                         <button class="btn" style="flex: 1; padding: 8px; background: #444;" onclick="clearAnnouncement()">Clear</button>
                     </div>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-card"><span id="statQuizTakers" class="stat-val">0</span><span class="stat-label">Quiz Finished</span></div>
-                    <div class="stat-card"><span id="statCollectors" class="stat-val">0</span><span class="stat-label">All Secrets Found</span></div>
                     <div class="stat-card"><span id="statTotalPosts" class="stat-val">0</span><span class="stat-label">Active Posts</span></div>
-                    <div class="stat-card"><span id="statDeletedCount" class="stat-val">0</span><span class="stat-label">Archived Posts</span></div>
-                </div>
-
-                <div class="stat-card" style="margin-bottom:15px; text-align: left;">
-                    <span class="stat-label">🕒 Server Activity Log</span>
-                    <div id="serverLog" style="font-size: 11px; color: #00ff88; margin-top: 5px; font-family: monospace;">No recent updates.</div>
-                </div>
-
-                <div class="stat-card" style="margin-bottom:15px;">
-                    <span class="stat-label">External Link Clicks</span>
-                    <div id="linkStats" style="font-size:12px; text-align:left; padding:10px;"></div>
-                </div>
-                
-                <p style="font-size: 12px; margin-bottom: 5px;">Top Comment Icons (%)</p>
-                <div id="iconBreakdown"></div>
-
-                <div class="deleted-vault">
-                    <strong>🗑️ Deleted Comment History:</strong>
-                    <div id="deletedList" style="margin-top:5px; opacity:0.8;"></div>
+                    <div class="stat-card"><span id="statGlobalClicks" class="stat-val">0</span><span class="stat-label">Viral Clicks</span></div>
                 </div>
 
                 <button class="btn-wipe" onclick="wipeServer()">⚠️ WIPE ALL SERVER DATA</button>
             </div>
             
             <button class="btn" style="width:100%; margin-top:20px;" onclick="document.getElementById('secretOverlay').style.display='none'">Exit Dashboard</button>
-            
             <p onclick="adminLogin()" style="text-align:center; font-size:10px; color:#121212; margin-top:15px; cursor:default;">server protocols</p>
         </div>
     </div>
 
     <div class="container">
-        <h1 onclick="triggerSecret(2)">KlayJES Universe</h1>
+        <h1 id="mainTitle" onclick="shakeTitle()">KlayJES Universe</h1>
 
         <section>
             <h2>Socials</h2>
-            <button class="btn" onclick="trackLink('KlayJES 2.0'); window.open('https://www.youtube.com/@KlayJES2.0'); triggerSecret(10);">KlayJES 2.0</button>
-            <button class="btn" onclick="trackLink('KlayJES Main'); window.open('https://www.youtube.com/@BrendaShackelford'); triggerSecret(11);">KlayJES</button>
-            <button class="btn" onclick="trackLink('Steam'); window.open('https://steamcommunity.com/profiles/76561199866435909/'); triggerSecret(12);">Steam</button>
+            <button class="btn" onclick="window.open('https://www.youtube.com/@KlayJES2.0'); triggerSecret(10);">KlayJES 2.0</button>
+            <button class="btn" onclick="window.open('https://www.youtube.com/@BrendaShackelford'); triggerSecret(11);">KlayJES Main</button>
+            <button class="btn" onclick="window.open('https://steamcommunity.com/profiles/76561199866435909/'); triggerSecret(12);">Steam</button>
         </section>
 
         <section>
             <h2>The Arcade</h2>
             <div class="grid">
-                <div class="card" onclick="trackLink('Snake'); window.open('https://www.google.com/search?q=play+snake'); triggerSecret(20);"><span class="thumb">🐍</span>Snake</div>
-                <div class="card" onclick="trackLink('Pac-Man'); window.open('https://www.google.com/search?q=play+pacman'); triggerSecret(21);"><span class="thumb">🟡</span>Pac-Man</div>
-                <div class="card" onclick="trackLink('TicTacToe'); window.open('https://www.google.com/search?q=play+tic+tac+toe'); triggerSecret(22);"><span class="thumb">❌</span>X/O</div>
-                <div class="card" onclick="trackLink('Solitaire'); window.open('https://www.google.com/search?q=play+solitaire'); triggerSecret(23);"><span class="thumb">🃏</span>Cards</div>
-                <div class="card" onclick="trackLink('Minesweeper'); window.open('https://www.google.com/search?q=play+minesweeper'); triggerSecret(24);"><span class="thumb">💣</span>Boom</div>
+                <div class="card" onclick="window.open('https://www.google.com/search?q=play+snake'); triggerSecret(20);"><span class="thumb">🐍</span>Snake</div>
+                <div class="card" onclick="window.open('https://www.google.com/search?q=play+pacman'); triggerSecret(21);"><span class="thumb">🟡</span>Pac-Man</div>
+                <div class="card" onclick="window.open('https://www.google.com/search?q=play+tic+tac+toe'); triggerSecret(22);"><span class="thumb">❌</span>X/O</div>
+                <div class="card" onclick="window.open('https://www.google.com/search?q=play+minesweeper'); triggerSecret(24);"><span class="thumb">💣</span>Boom</div>
             </div>
         </section>
 
         <section id="quizSection">
             <h2>The Mega Quiz</h2>
-            <div id="quizContainer">
-                <div id="questionText" style="font-size: 1.2rem; margin-bottom: 20px;"></div>
-                <div id="optionsList"></div>
-            </div>
+            <div id="quizContainer"></div>
         </section>
 
         <section id="commentSection">
@@ -341,6 +343,8 @@
             </div>
             <div id="commentList"></div>
         </section>
+
+        <button class="btn-danger-viral" id="viralBtn" onclick="viralClick()">⚠️ DO NOT CLICK (Clicks: 0)</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -355,37 +359,40 @@
             projectId: "klayjes-universe-19926",
             storageBucket: "klayjes-universe-19926.firebasestorage.app",
             messagingSenderId: "509695877780",
-            appId: "1:509695877780:web:cce6d3869f6f327a28ca81",
-            measurementId: "G-QE1YH857SL"
+            appId: "1:509695877780:web:cce6d3869f6f327a28ca81"
         };
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const announceRef = database.ref('announcement');
         const commentsRef = database.ref('comments');
+        const clickRef = database.ref('global_clicks');
+        const serverStateRef = database.ref('server_state');
 
-        let foundSecrets, comments = [], deletedComments = [], linkClicks = {}, quizCompletions = 0, isAdmin = false;
+        let foundSecrets = [], comments = [], isAdmin = false;
         const bgMusic = document.getElementById('bgMusic');
 
-        function loadData() {
-            foundSecrets = JSON.parse(localStorage.getItem('kj_secrets_v8') || '[]');
-            linkClicks = JSON.parse(localStorage.getItem('kj_links_v8') || '{}');
-            quizCompletions = parseInt(localStorage.getItem('kj_quiz_done') || '0');
-        }
+        // SYNC SERVER STATE
+        serverStateRef.on('value', (snapshot) => {
+            const state = snapshot.val() || {};
+            const title = document.getElementById('mainTitle');
+            if (state.glitchMode) title.classList.add('glitch-text'); else title.classList.remove('glitch-text');
+            if (state.rainbowMode) document.body.classList.add('rainbow-mode'); else document.body.classList.remove('rainbow-mode');
+            
+            document.body.className = document.body.className.replace(/theme-\S+/g, '');
+            if (state.currentTheme && state.currentTheme !== 'default') {
+                document.body.classList.add('theme-' + state.currentTheme);
+            }
+        });
 
         window.addEventListener('load', () => {
-            loadData();
+            foundSecrets = JSON.parse(localStorage.getItem('kj_secrets_v8') || '[]');
             let visits = parseInt(localStorage.getItem('kj_visits') || "0");
             localStorage.setItem('kj_visits', visits + 1);
-            
+
             announceRef.on('value', (snapshot) => {
                 const data = snapshot.val();
-                if(data) {
-                    applyBanner(data.text, data.color);
-                    localStorage.setItem('kj_last_update', data.timestamp);
-                } else {
-                    applyBanner("", "");
-                }
+                applyBanner(data?.text || "", data?.color || "");
             });
 
             commentsRef.on('value', (snapshot) => {
@@ -395,272 +402,144 @@
                 if(isAdmin) refreshDashboard();
             });
 
+            clickRef.on('value', (s) => {
+                const val = s.val() || 0;
+                document.getElementById('viralBtn').innerText = `⚠️ DO NOT CLICK (Clicks: ${val})`;
+                if(isAdmin) document.getElementById('statGlobalClicks').innerText = val;
+            });
+
             setTimeout(() => {
                 document.getElementById('loadingOverlay').classList.add('fade-out');
-                bgMusic.play().then(() => { updateViz(true); }).catch(() => {});
+                bgMusic.play().catch(() => {});
             }, 1600);
 
             startQuiz();
+            refreshDashboard();
+            checkTimeTheme();
         });
-
-        function updateAnnouncement() {
-            const val = document.getElementById('adminAnnounceInput').value;
-            const color = document.getElementById('bannerColor').value;
-            
-            announceRef.set({
-                text: val,
-                color: color,
-                timestamp: new Date().toLocaleString()
-            }).then(() => {
-                alert("Global Banner Sync Complete!");
-            });
-        }
-
-        function clearAnnouncement() {
-            announceRef.remove().then(() => {
-                alert("Banner Cleared Globally!");
-            });
-        }
 
         function applyBanner(text, color) {
             const banner = document.getElementById('announcementBanner');
             if (text) {
                 banner.innerText = text;
                 banner.style.background = `linear-gradient(90deg, ${color}, #000)`;
-                banner.style.borderBottom = `2px solid ${color}`;
                 banner.style.display = 'block';
-            } else {
-                banner.style.display = 'none';
-            }
+            } else banner.style.display = 'none';
         }
 
-        function updateViz(playing) {
-            const viz = document.getElementById('visualizer');
-            if(viz) viz.style.display = playing ? 'flex' : 'none';
+        // --- ADMIN HANDLER (WITH MSG FIX) ---
+        function updateAnnouncement() {
+            const val = document.getElementById('adminAnnounceInput').value.trim();
+            const lowerVal = val.toLowerCase();
+            const color = document.getElementById('bannerColor').value;
+
+            if (lowerVal === ":glitch on") {
+                serverStateRef.update({ glitchMode: true });
+            } else if (lowerVal === ":glitch off") {
+                serverStateRef.update({ glitchMode: false });
+            } else if (lowerVal === ":rainbow on") {
+                serverStateRef.update({ rainbowMode: true });
+            } else if (lowerVal === ":rainbow off") {
+                serverStateRef.update({ rainbowMode: false });
+            } else if (lowerVal.startsWith(":theme ")) {
+                const theme = lowerVal.split(" ")[1];
+                serverStateRef.update({ currentTheme: theme });
+            } else if (lowerVal.startsWith(":alert ")) {
+                // MSG COMMAND FIX: Logs to browser console with styling
+                const msg = val.substring(7);
+                console.log("%c KJ-SYSTEM: " + msg, "color: #00ff88; font-weight: bold; background: #000; padding: 5px;");
+            } else {
+                announceRef.set({ text: val, color: color });
+            }
+            document.getElementById('adminAnnounceInput').value = "";
+        }
+
+        function clearAnnouncement() { announceRef.remove(); }
+        function shakeTitle() { 
+            const t = document.getElementById('mainTitle');
+            t.classList.add('shake-it'); setTimeout(() => t.classList.remove('shake-it'), 500);
+            triggerSecret(2);
+        }
+        function viralClick() { clickRef.transaction(c => (c || 0) + 1); }
+
+        function checkTimeTheme() {
+            const hr = new Date().getHours();
+            if (hr >= 22 || hr < 5) document.body.classList.add('theme-night');
+            else if (hr >= 5 && hr < 10) document.body.classList.add('theme-morning');
         }
 
         function toggleMusic() {
             const icon = document.getElementById('musicIcon');
             const status = document.getElementById('musicStatus');
+            const viz = document.getElementById('visualizer');
             if (bgMusic.paused) {
-                bgMusic.play();
-                icon.innerText = "🔊";
-                status.innerText = "Music: Playing";
-                updateViz(true);
+                bgMusic.play(); icon.innerText = "🔊"; status.innerText = "Music: Playing"; viz.style.display = 'flex';
             } else {
-                bgMusic.pause();
-                icon.innerText = "🔇";
-                status.innerText = "Music: Muted";
-                updateViz(false);
+                bgMusic.pause(); icon.innerText = "🔇"; status.innerText = "Music: Muted"; viz.style.display = 'none';
             }
         }
 
-        function openTracker() {
-            document.getElementById('secretOverlay').style.display = 'flex';
-            triggerSecret(1);
-            refreshDashboard();
-        }
-
+        function openTracker() { document.getElementById('secretOverlay').style.display = 'flex'; triggerSecret(1); refreshDashboard(); }
+        
         function refreshDashboard() {
             document.getElementById('statSecrets').innerText = `${foundSecrets.length}/25`;
             document.getElementById('statVisits').innerText = localStorage.getItem('kj_visits') || 0;
             
+            const secrets = [
+                { id: 1, name: "Tracker Access" }, { id: 2, name: "Title Shake" },
+                { id: 3, name: "Admin Key" }, { id: 6, name: "Quiz Taker" },
+                { id: 10, name: "2.0 Social" }, { id: 11, name: "Main Social" },
+                { id: 12, name: "Steam Pilot" }, { id: 20, name: "Snake Hunter" },
+                { id: 21, name: "Power Pellet" }, { id: 22, name: "X/O Legend" },
+                { id: 24, name: "Bomb Squad" }
+            ];
+
             const list = document.getElementById('secretList');
             list.innerHTML = secrets.map(s => {
                 const isFound = foundSecrets.includes(s.id);
-                return `<div class="secret-item ${isFound ? 'unlocked' : ''}">
-                    <strong>#${s.id} ${isFound ? s.name : '???' }</strong>
-                    <div style="font-size:10px; opacity:0.7;">${isFound ? 'Status: Unlocked' : 'Status: Locked'}</div>
-                </div>`;
+                return `<div class="secret-item ${isFound ? 'unlocked' : ''}"><strong>#${s.id} ${isFound ? s.name : '???' }</strong></div>`;
             }).join('');
 
             if (isAdmin) {
                 document.getElementById('adminOnlyStats').style.display = 'block';
                 document.getElementById('statTotalPosts').innerText = comments.length;
-                document.getElementById('statDeletedCount').innerText = deletedComments.length;
-                document.getElementById('statQuizTakers').innerText = quizCompletions;
-                document.getElementById('statCollectors').innerText = foundSecrets.length >= 25 ? "1" : "0";
-                
-                const lastLog = localStorage.getItem('kj_last_update') || "No history.";
-                document.getElementById('serverLog').innerText = `LAST UPDATE: ${lastLog}`;
-
-                document.getElementById('linkStats').innerHTML = Object.entries(linkClicks).map(([name, count]) => 
-                    `<div>${name}: <strong>${count}</strong></div>`).join('') || "No clicks tracked.";
-
-                document.getElementById('deletedList').innerHTML = deletedComments.slice(-5).map(c => 
-                    `[${c.icon}] ${c.text.substring(0,20)}...`).join('<br>') || "No history.";
-
-                calculateIconStats();
             }
         }
 
-        function wipeServer() {
-            if (confirm("THIS WILL DELETE ALL CLOUD COMMENTS AND BANNER. ARE YOU SURE?")) {
-                let check = prompt("Type 'CONFIRM WIPE':");
-                if (check === "CONFIRM WIPE") {
-                    announceRef.remove();
-                    commentsRef.remove();
-                    localStorage.clear();
-                    location.reload();
-                }
-            }
-        }
+        function adminLogin() { if (prompt("Server Admin Code:") === "KJadmin") { isAdmin = true; document.getElementById('adminBadge').style.display = 'block'; triggerSecret(3); refreshDashboard(); } }
+        function triggerSecret(id) { if (!foundSecrets.includes(id)) { foundSecrets.push(id); localStorage.setItem('kj_secrets_v8', JSON.stringify(foundSecrets)); } }
 
-        function trackLink(name) {
-            linkClicks[name] = (linkClicks[name] || 0) + 1;
-            localStorage.setItem('kj_links_v8', JSON.stringify(linkClicks));
-        }
-
-        function calculateIconStats() {
-            const breakdown = document.getElementById('iconBreakdown');
-            if(!breakdown) return;
-            breakdown.innerHTML = '';
-            const icons = ['🎮', '🐸', '⭐'];
-            const allCommentsCount = comments.length || 1;
-            icons.forEach(icon => {
-                const count = comments.filter(c => c.icon === icon).length;
-                const perc = Math.round((count / allCommentsCount) * 100);
-                breakdown.innerHTML += `
-                    <div style="margin-top:10px; font-size:11px;">
-                        ${icon} ${perc}% (${count} total)
-                        <div class="percent-bar"><div class="percent-fill" style="width:${perc}%"></div></div>
-                    </div>`;
-            });
-        }
-
-        function adminLogin() {
-            if (prompt("Server Admin Code:") === "KJadmin") {
-                isAdmin = true;
-                document.getElementById('adminBadge').style.display = 'block';
-                triggerSecret(3);
-                refreshDashboard();
-                renderComments();
-                alert("Master Analytics Online.");
-            }
-        }
-
-        const secrets = [
-            { id: 1, name: "YT Trigger", hint: "Clicked the tracker button." },
-            { id: 2, name: "Title Master", hint: "Clicked the main heading." },
-            { id: 3, name: "The Key", hint: "Logged in as Server Admin." },
-            { id: 4, name: "Communicator", hint: "Posted a comment." },
-            { id: 5, name: "Frog King", hint: "Commented using the Frog icon." },
-            { id: 6, name: "Quiz Taker", hint: "Finished the quiz once." },
-            { id: 7, name: "Elite Brain", hint: "Perfect quiz score." },
-            { id: 10, name: "2.0 Social", hint: "Visited KlayJES 2.0." },
-            { id: 11, name: "Main Social", hint: "Visited KlayJES Main." },
-            { id: 12, name: "Steam Pilot", hint: "Checked Steam." },
-            { id: 20, name: "Snake Hunter", hint: "Opened Snake." },
-            { id: 21, name: "Power Pellet", hint: "Opened Pacman." },
-            { id: 22, name: "X/O Legend", hint: "Opened Tic Tac Toe." },
-            { id: 23, name: "Card Shark", hint: "Opened Solitaire." },
-            { id: 24, name: "Bomb Squad", hint: "Opened Minesweeper." },
-            { id: 25, name: "The Collector", hint: "Found every secret." }
+        // QUIZ ENGINE
+        const quizData = [
+            { q: "What is the second channel?", a: ["Lite", "2.0"], c: 1 },
+            { q: "How many secrets total?", a: ["10", "25"], c: 1 },
+            { q: "Is KlayJES a Gamer?", a: ["No", "Yes"], c: 1 }
         ];
-
-        function triggerSecret(id) {
-            if (!foundSecrets.includes(id)) {
-                foundSecrets.push(id);
-                localStorage.setItem('kj_secrets_v8', JSON.stringify(foundSecrets));
-                if(foundSecrets.length >= 25) triggerSecret(25);
-            }
-        }
-
-        const quizDataOriginal = [
-            { q: "What is the second channel?", a: ["Lite", "2.0", "Main"], c: 1 },
-            { q: "Who is the main channel?", a: ["KlayJES", "Brenda", "Gamer"], c: 0 },
-            { q: "Which game uses Snake?", a: ["Pacman", "Snake", "Cards"], c: 1 },
-            { q: "What icon is a Frog?", a: ["🎮", "🐸", "⭐"], c: 1 },
-            { q: "Is KlayJES a Gamer?", a: ["No", "Maybe", "Yes"], c: 2 },
-            { q: "Which arcade game has a bomb icon?", a: ["Minesweeper", "Snake", "Pacman"], c: 0 },
-            { q: "How many secrets are there total?", a: ["10", "50", "25"], c: 2 }
-        ];
-
-        let shuffledQuiz = [], qIdx = 0, score = 0;
+        let qIdx = 0, score = 0;
         function startQuiz() {
+            qIdx = 0; score = 0;
             const container = document.getElementById('quizContainer');
-            if(container) container.innerHTML = `<div id="questionText" style="font-size: 1.2rem; margin-bottom: 20px;"></div><div id="optionsList"></div>`;
-            shuffledQuiz = [...quizDataOriginal].sort(() => Math.random() - 0.5);
-            qIdx = 0; score = 0; showQ(); 
+            container.innerHTML = `<div id="qText" style="margin-bottom:15px; font-size:1.1rem;"></div><div id="qOpts"></div>`;
+            showQ();
         }
-
         function showQ() {
-            const container = document.getElementById('quizContainer');
-            if (qIdx >= shuffledQuiz.length) {
-                container.innerHTML = `<div style="text-align:center;"><h3>Final Score: ${score}/${shuffledQuiz.length}</h3><button class="btn" onclick="startQuiz()">Restart Quiz</button></div>`;
-                quizCompletions++;
-                localStorage.setItem('kj_quiz_done', quizCompletions);
-                triggerSecret(6);
-                if(score === shuffledQuiz.length) triggerSecret(7);
-                return;
+            if (qIdx >= quizData.length) {
+                document.getElementById('quizContainer').innerHTML = `<h3>Score: ${score}/${quizData.length}</h3><button class="btn" onclick="startQuiz()">Restart</button>`;
+                triggerSecret(6); return;
             }
-            const q = shuffledQuiz[qIdx];
-            document.getElementById('questionText').innerText = q.q;
-            document.getElementById('optionsList').innerHTML = q.a.map((opt, i) => `<button class="quiz-option" id="opt-${i}" onclick="handleQuiz(${i})">${opt}</button>`).join('');
+            document.getElementById('qText').innerText = quizData[qIdx].q;
+            document.getElementById('qOpts').innerHTML = quizData[qIdx].a.map((o, i) => `<button class="quiz-option" onclick="handleQuiz(${i})">${o}</button>`).join('');
         }
+        window.handleQuiz = (i) => { if (i === quizData[qIdx].c) score++; qIdx++; showQ(); };
 
-        window.handleQuiz = (i) => {
-            const currentQ = shuffledQuiz[qIdx];
-            const buttons = document.querySelectorAll('.quiz-option');
-            buttons.forEach(b => b.classList.add('no-click'));
-            if(i === currentQ.c) { document.getElementById(`opt-${i}`).classList.add('correct'); score++; }
-            else { document.getElementById(`opt-${i}`).classList.add('wrong'); document.getElementById(`opt-${currentQ.c}`).classList.add('correct'); }
-            setTimeout(() => { qIdx++; showQ(); }, 1000);
-        };
-
-        function checkCommentLock() {
-            const pass = document.getElementById('commentPass').value;
-            const btn = document.getElementById('postBtn');
-            btn.disabled = pass.trim().length === 0;
-            btn.innerText = btn.disabled ? "Enter Password to Post" : "Post Comment";
-        }
-
+        // COMMENTS
+        function renderComments() { document.getElementById('commentList').innerHTML = comments.map(c => `<div class="comment-item"><strong>${c.icon} ${c.user}</strong><p>${c.text}</p></div>`).reverse().join(''); }
         function postComment() {
-            const text = document.getElementById('commentText').value;
-            const pass = document.getElementById('commentPass').value;
-            const icon = document.getElementById('userIcon').value;
-            if(!text || !pass) return;
-
-            const newId = Date.now();
-            commentsRef.child(newId).set({
-                id: newId,
-                icon: icon,
-                text: text,
-                pass: pass,
-                badges: []
-            });
-
-            triggerSecret(4);
-            if(icon === '🐸') triggerSecret(5);
-            
+            commentsRef.push({ user: isAdmin ? "Admin" : "User", icon: document.getElementById('userIcon').value, text: document.getElementById('commentText').value });
             document.getElementById('commentText').value = "";
-            document.getElementById('commentPass').value = "";
-            checkCommentLock();
         }
-
-        function deleteComment(id) {
-            const target = comments.find(c => c.id === id);
-            if (!isAdmin && prompt("Password:") !== target.pass) return alert("Wrong!");
-            deletedComments.push(target);
-            commentsRef.child(id).remove();
-        }
-
-        function renderComments() {
-            document.getElementById('commentList').innerHTML = comments.map(c => `
-                <div class="comment-item">
-                    <strong>${c.icon} User</strong>: ${c.text}
-                    <div class="badge-list">${(c.badges || []).map(b => `<span class="badge-icon">${b}</span>`).join('')}</div>
-                    
-                    <span class="admin-badge-trigger" onclick="toggleBadgeBox(${c.id})" style="${isAdmin ? 'display:block' : ''}">🏆</span>
-                    <button class="btn-del" onclick="deleteComment(${c.id})">Delete</button>
-                </div>
-            `).join('');
-        }
-
-        function toggleBadgeBox(id) {
-             // Logic for manual badge selection could go here if needed
-             alert("Badge management for ID: " + id);
-        }
+        function checkCommentLock() { document.getElementById('postBtn').disabled = document.getElementById('commentPass').value.length < 3; document.getElementById('postBtn').innerText = "Post Comment"; }
+        function wipeServer() { if(confirm("WIPE?") && prompt("Type 'WIPE'") === "WIPE") { announceRef.remove(); commentsRef.remove(); clickRef.remove(); localStorage.clear(); location.reload(); }}
     </script>
 </body>
 </html>
