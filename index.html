@@ -25,7 +25,7 @@
             overflow-x: hidden; 
         }
 
-        /* NEW: GLOBAL ANNOUNCEMENT BANNER */
+        /* --- GLOBAL ANNOUNCEMENT BANNER STYLE --- */
         #announcementBanner {
             background: linear-gradient(90deg, #ff0000, #000);
             color: white;
@@ -84,7 +84,12 @@
         }
 
         /* GRID & CARDS */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .grid { 
+            display: grid; 
+            /* Optimized for responsiveness */
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 15px; 
+        }
         .card { 
             background: #111; padding: 15px; border-radius: 10px; 
             text-align: center; transition: 0.3s; border: 1px solid #333; cursor: pointer; 
@@ -128,7 +133,7 @@
         }
 
         /* STATS STYLES */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
         .stat-card { background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333; text-align: center; cursor: pointer; transition: 0.3s; }
         .stat-card:hover { border-color: #00ff88; }
         .stat-val { display: block; font-size: 1.5rem; font-weight: bold; color: #00ff88; }
@@ -181,6 +186,24 @@
         }
         .badge-opt:hover { background: #00ff88; color: black; }
 
+        /* --- MOBILE & TABLET OPTIMIZATION --- */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.2rem; }
+            .container { padding: 10px; }
+            section { padding: 15px; margin-top: 15px; }
+            .btn { width: 100%; margin-bottom: 8px; padding: 15px; }
+            .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            #secretBox { width: 95%; padding: 15px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            #ytSecretBtn { width: 45px; height: 32px; top: 60px; }
+        }
+
+        @media (max-width: 480px) {
+            .grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.5rem; }
+        }
+
     </style>
 </head>
 <body>
@@ -207,7 +230,7 @@
                 <div class="stat-card"><span id="statSecrets" class="stat-val">0/25</span><span class="stat-label">Secrets Found</span></div>
                 <div class="stat-card"><span id="statVisits" class="stat-val">0</span><span class="stat-label">Total Visits</span></div>
                 
-                <div class="stat-card" onclick="toggleMusic()" style="grid-column: span 2; border: 1px dashed #444;">
+                <div class="stat-card" onclick="toggleMusic()" style="grid-column: span 1; border: 1px dashed #444;">
                     <span id="musicIcon" class="stat-val">🔊</span>
                     <span id="musicStatus" class="stat-label">Music: Playing</span>
                     <div class="viz-container" id="visualizer">
@@ -270,7 +293,7 @@
             
             <button class="btn" style="width:100%; margin-top:20px;" onclick="document.getElementById('secretOverlay').style.display='none'">Exit Dashboard</button>
             
-            <p onclick="adminLogin()" style="text-align:center; font-size:10px; color:#121212; margin-top:15px; cursor:default;">server protocals</p>
+            <p onclick="adminLogin()" style="text-align:center; font-size:10px; color:#121212; margin-top:15px; cursor:default;">server protocols</p>
         </div>
     </div>
 
@@ -320,14 +343,32 @@
         </section>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
     <script>
-        let foundSecrets, comments, deletedComments, linkClicks, quizCompletions, isAdmin = false;
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFq-nUKUAXoUJTlIqyuCvrVmd5Dj3wVLs",
+            authDomain: "klayjes-universe-19926.firebaseapp.com",
+            databaseURL: "https://klayjes-universe-19926-default-rtdb.firebaseio.com",
+            projectId: "klayjes-universe-19926",
+            storageBucket: "klayjes-universe-19926.firebasestorage.app",
+            messagingSenderId: "509695877780",
+            appId: "1:509695877780:web:cce6d3869f6f327a28ca81",
+            measurementId: "G-QE1YH857SL"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const announceRef = database.ref('announcement');
+        const commentsRef = database.ref('comments');
+
+        let foundSecrets, comments = [], deletedComments = [], linkClicks = {}, quizCompletions = 0, isAdmin = false;
         const bgMusic = document.getElementById('bgMusic');
 
         function loadData() {
             foundSecrets = JSON.parse(localStorage.getItem('kj_secrets_v8') || '[]');
-            comments = JSON.parse(localStorage.getItem('kj_comments_v8') || '[]');
-            deletedComments = JSON.parse(localStorage.getItem('kj_deleted_v8') || '[]');
             linkClicks = JSON.parse(localStorage.getItem('kj_links_v8') || '{}');
             quizCompletions = parseInt(localStorage.getItem('kj_quiz_done') || '0');
         }
@@ -337,45 +378,48 @@
             let visits = parseInt(localStorage.getItem('kj_visits') || "0");
             localStorage.setItem('kj_visits', visits + 1);
             
-            // Initial Banner Setup from Storage
-            const savedText = localStorage.getItem('kj_announce_v8');
-            const savedColor = localStorage.getItem('kj_announce_color') || "#ff0000";
-            if(savedText) {
-                applyBanner(savedText, savedColor);
-            }
+            announceRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    applyBanner(data.text, data.color);
+                    localStorage.setItem('kj_last_update', data.timestamp);
+                } else {
+                    applyBanner("", "");
+                }
+            });
+
+            commentsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                comments = data ? Object.values(data) : [];
+                renderComments();
+                if(isAdmin) refreshDashboard();
+            });
 
             setTimeout(() => {
                 document.getElementById('loadingOverlay').classList.add('fade-out');
                 bgMusic.play().then(() => { updateViz(true); }).catch(() => {});
             }, 1600);
 
-            renderComments();
             startQuiz();
         });
 
-        // --- UPDATED ANNOUNCEMENT LOGIC ---
         function updateAnnouncement() {
             const val = document.getElementById('adminAnnounceInput').value;
             const color = document.getElementById('bannerColor').value;
-            const now = new Date().toLocaleString();
-
-            localStorage.setItem('kj_announce_v8', val);
-            localStorage.setItem('kj_announce_color', color);
-            localStorage.setItem('kj_last_update', now);
             
-            applyBanner(val, color);
-            alert("Banner Updated!");
-            refreshDashboard();
+            announceRef.set({
+                text: val,
+                color: color,
+                timestamp: new Date().toLocaleString()
+            }).then(() => {
+                alert("Global Banner Sync Complete!");
+            });
         }
 
         function clearAnnouncement() {
-            localStorage.removeItem('kj_announce_v8');
-            localStorage.removeItem('kj_announce_color');
-            localStorage.setItem('kj_last_update', "Cleared at: " + new Date().toLocaleString());
-            document.getElementById('adminAnnounceInput').value = "";
-            applyBanner("", "");
-            alert("Banner Cleared!");
-            refreshDashboard();
+            announceRef.remove().then(() => {
+                alert("Banner Cleared Globally!");
+            });
         }
 
         function applyBanner(text, color) {
@@ -390,10 +434,9 @@
             }
         }
 
-        // --- MUSIC & VIZ LOGIC ---
         function updateViz(playing) {
             const viz = document.getElementById('visualizer');
-            viz.style.display = playing ? 'flex' : 'none';
+            if(viz) viz.style.display = playing ? 'flex' : 'none';
         }
 
         function toggleMusic() {
@@ -412,7 +455,6 @@
             }
         }
 
-        // --- DASHBOARD ---
         function openTracker() {
             document.getElementById('secretOverlay').style.display = 'flex';
             triggerSecret(1);
@@ -439,7 +481,6 @@
                 document.getElementById('statQuizTakers').innerText = quizCompletions;
                 document.getElementById('statCollectors').innerText = foundSecrets.length >= 25 ? "1" : "0";
                 
-                // Show Server Log
                 const lastLog = localStorage.getItem('kj_last_update') || "No history.";
                 document.getElementById('serverLog').innerText = `LAST UPDATE: ${lastLog}`;
 
@@ -454,9 +495,11 @@
         }
 
         function wipeServer() {
-            if (confirm("THIS WILL DELETE ALL DATA FOREVER. ARE YOU SURE?")) {
+            if (confirm("THIS WILL DELETE ALL CLOUD COMMENTS AND BANNER. ARE YOU SURE?")) {
                 let check = prompt("Type 'CONFIRM WIPE':");
                 if (check === "CONFIRM WIPE") {
+                    announceRef.remove();
+                    commentsRef.remove();
                     localStorage.clear();
                     location.reload();
                 }
@@ -470,11 +513,12 @@
 
         function calculateIconStats() {
             const breakdown = document.getElementById('iconBreakdown');
+            if(!breakdown) return;
             breakdown.innerHTML = '';
             const icons = ['🎮', '🐸', '⭐'];
-            const allCommentsCount = comments.length + deletedComments.length || 1;
+            const allCommentsCount = comments.length || 1;
             icons.forEach(icon => {
-                const count = (comments.filter(c => c.icon === icon).length) + (deletedComments.filter(c => c.icon === icon).length);
+                const count = comments.filter(c => c.icon === icon).length;
                 const perc = Math.round((count / allCommentsCount) * 100);
                 breakdown.innerHTML += `
                     <div style="margin-top:10px; font-size:11px;">
@@ -495,7 +539,6 @@
             }
         }
 
-        // --- SECRETS LIST ---
         const secrets = [
             { id: 1, name: "YT Trigger", hint: "Clicked the tracker button." },
             { id: 2, name: "Title Master", hint: "Clicked the main heading." },
@@ -523,7 +566,6 @@
             }
         }
 
-        // --- QUIZ LOGIC ---
         const quizDataOriginal = [
             { q: "What is the second channel?", a: ["Lite", "2.0", "Main"], c: 1 },
             { q: "Who is the main channel?", a: ["KlayJES", "Brenda", "Gamer"], c: 0 },
@@ -536,7 +578,8 @@
 
         let shuffledQuiz = [], qIdx = 0, score = 0;
         function startQuiz() {
-            document.getElementById('quizContainer').innerHTML = `<div id="questionText" style="font-size: 1.2rem; margin-bottom: 20px;"></div><div id="optionsList"></div>`;
+            const container = document.getElementById('quizContainer');
+            if(container) container.innerHTML = `<div id="questionText" style="font-size: 1.2rem; margin-bottom: 20px;"></div><div id="optionsList"></div>`;
             shuffledQuiz = [...quizDataOriginal].sort(() => Math.random() - 0.5);
             qIdx = 0; score = 0; showQ(); 
         }
@@ -565,7 +608,6 @@
             setTimeout(() => { qIdx++; showQ(); }, 1000);
         };
 
-        // --- COMMENTS & BADGES ---
         function checkCommentLock() {
             const pass = document.getElementById('commentPass').value;
             const btn = document.getElementById('postBtn');
@@ -578,56 +620,46 @@
             const pass = document.getElementById('commentPass').value;
             const icon = document.getElementById('userIcon').value;
             if(!text || !pass) return;
-            comments.push({ id: Date.now(), icon, text, pass, badges: [] });
+
+            const newId = Date.now();
+            commentsRef.child(newId).set({
+                id: newId,
+                icon: icon,
+                text: text,
+                pass: pass,
+                badges: []
+            });
+
             triggerSecret(4);
             if(icon === '🐸') triggerSecret(5);
-            localStorage.setItem('kj_comments_v8', JSON.stringify(comments));
+            
             document.getElementById('commentText').value = "";
             document.getElementById('commentPass').value = "";
             checkCommentLock();
-            renderComments();
         }
 
         function deleteComment(id) {
-            const targetIndex = comments.findIndex(c => c.id === id);
-            const target = comments[targetIndex];
+            const target = comments.find(c => c.id === id);
             if (!isAdmin && prompt("Password:") !== target.pass) return alert("Wrong!");
             deletedComments.push(target);
-            localStorage.setItem('kj_deleted_v8', JSON.stringify(deletedComments));
-            comments.splice(targetIndex, 1);
-            localStorage.setItem('kj_comments_v8', JSON.stringify(comments));
-            renderComments();
-        }
-
-        function toggleBadgeBox(id) {
-            const el = document.getElementById(`badges-${id}`);
-            el.style.display = (el.style.display === 'grid') ? 'none' : 'grid';
-        }
-
-        function awardBadge(commentId, badgeType) {
-            const comment = comments.find(c => c.id === commentId);
-            if (!comment.badges.includes(badgeType)) {
-                comment.badges.push(badgeType);
-                localStorage.setItem('kj_comments_v8', JSON.stringify(comments));
-                renderComments();
-            }
-            toggleBadgeBox(commentId);
+            commentsRef.child(id).remove();
         }
 
         function renderComments() {
             document.getElementById('commentList').innerHTML = comments.map(c => `
                 <div class="comment-item">
                     <strong>${c.icon} User</strong>: ${c.text}
-                    <div class="badge-list">${c.badges.map(b => `<span class="badge-icon">${b}</span>`).join('')}</div>
-                    <div class="admin-badge-trigger" style="display: ${isAdmin ? 'block' : 'none'}" onclick="toggleBadgeBox(${c.id})">➜</div>
-                    <div class="badge-selector" id="badges-${c.id}">
-                        <div class="badge-opt" onclick="awardBadge(${c.id}, '🎖️ Honor')">🎖️ Badge of Honor</div>
-                        <div class="badge-opt" onclick="awardBadge(${c.id}, '🤝 Kindness')">🤝 Badge of Kindness</div>
-                        <div class="badge-opt" onclick="awardBadge(${c.id}, '🔥 Elite')">🔥 Elite Contributor</div>
-                        <div class="badge-opt" onclick="awardBadge(${c.id}, '🧠 Genius')">🧠 Big Brain</div>
-                    </div>
-                    <br><button class="btn-del" onclick="deleteComment(${c.id})">${isAdmin ? 'ADMIN DELETE' : 'Delete'}</button>
-                </div>`).join('');
+                    <div class="badge-list">${(c.badges || []).map(b => `<span class="badge-icon">${b}</span>`).join('')}</div>
+                    
+                    <span class="admin-badge-trigger" onclick="toggleBadgeBox(${c.id})" style="${isAdmin ? 'display:block' : ''}">🏆</span>
+                    <button class="btn-del" onclick="deleteComment(${c.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function toggleBadgeBox(id) {
+             // Logic for manual badge selection could go here if needed
+             alert("Badge management for ID: " + id);
         }
     </script>
 </body>
